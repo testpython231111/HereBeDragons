@@ -1,0 +1,11 @@
+const E = require('../src/engine.js');
+const fs = require('fs');
+E.init(JSON.parse(fs.readFileSync('data/countries.json')), JSON.parse(fs.readFileSync('data/cities.json')));
+const t0 = Date.now();
+const sched = E.buildSchedule(400);
+console.log('built 400 days in', Date.now() - t0, 'ms');
+for (const d of sched.slice(0, 21)) console.log(String(d.d).padStart(3), d.k.map(k => E.parseKey(k).text).join(' | '));
+const cnt = {}; for (const d of sched) for (const k of d.k) cnt[k] = (cnt[k] || 0) + 1;
+console.log('distinct prompts used', Object.keys(cnt).length, 'max reuse in 400 days', Math.max(...Object.values(cnt)));
+fs.writeFileSync('data/schedule.json', JSON.stringify(sched));
+console.log('schedule bytes', JSON.stringify(sched).length);
